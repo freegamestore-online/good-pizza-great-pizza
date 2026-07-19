@@ -78,10 +78,10 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
     k.add([k.rect(VW, 6), k.color(...PAL.divider), k.pos(0, VH / 2 - 3), k.z(10)]);
 
     // ── Section labels ────────────────────────────────────────────────────────
-    k.add([k.text("① KNEAD DOUGH",  { size: 13 }), k.color(...PAL.orange), k.pos(16, VH / 2 + 10), k.z(12)]);
-    k.add([k.text("② ADD TOPPINGS", { size: 13 }), k.color(...PAL.orange), k.pos(VW / 2 + 12, VH / 2 + 10), k.z(12)]);
-    k.add([k.text("③ BAKE",         { size: 13 }), k.color(255, 160, 40), k.pos(VW / 2 + 12, 10), k.z(12)]);
-    k.add([k.text("④ PACK",         { size: 13 }), k.color(...PAL.blue),  k.pos(16, 10), k.z(12)]);
+    k.add([k.text("1 KNEAD DOUGH",  { size: 13 }), k.color(...PAL.orange), k.pos(16, VH / 2 + 10), k.z(12)]);
+    k.add([k.text("2 ADD TOPPINGS", { size: 13 }), k.color(...PAL.orange), k.pos(VW / 2 + 12, VH / 2 + 10), k.z(12)]);
+    k.add([k.text("3 BAKE",         { size: 13 }), k.color(255, 160, 40), k.pos(VW / 2 + 12, 10), k.z(12)]);
+    k.add([k.text("4 PACK",         { size: 13 }), k.color(...PAL.blue),  k.pos(16, 10), k.z(12)]);
 
     // =========================================================================
     //  Q1 — BOTTOM-LEFT — KNEAD DOUGH
@@ -114,12 +114,12 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
       k.z(2),
     ]);
 
-    // Knead ripple rings
+    // Knead ripple rings (use opacity component)
     const ring1 = k.add([k.circle(D_R - 10), k.color(220, 190, 140), k.anchor("center"), k.pos(D_CX, D_CY), k.z(3), k.opacity(0)]);
     const ring2 = k.add([k.circle(D_R - 22), k.color(220, 190, 140), k.anchor("center"), k.pos(D_CX, D_CY), k.z(3), k.opacity(0)]);
     const ring3 = k.add([k.circle(D_R - 34), k.color(220, 190, 140), k.anchor("center"), k.pos(D_CX, D_CY), k.z(3), k.opacity(0)]);
 
-    // Progress bar
+    // Progress bar bg
     k.add([k.rect(160, 16, { radius: 8 }), k.color(200, 188, 168), k.anchor("center"), k.pos(D_CX, VH - 22), k.z(3)]);
     const kneadBar = k.add([k.rect(1, 12, { radius: 6 }), k.color(...PAL.green), k.pos(D_CX - 80, VH - 28), k.z(4)]);
     const kneadPct = k.add([k.text("Knead: 0%", { size: 12 }), k.color(...PAL.black), k.anchor("center"), k.pos(D_CX, VH - 44), k.z(4)]);
@@ -149,15 +149,15 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
           kneadPct.text  = `Knead: ${Math.floor(state.kneadProgress)}%`;
           const t = state.kneadProgress / 100;
           doughBlob.color = k.rgb(
-            Math.round(PAL.doughRaw[0] + t * (PAL.doughReady[0] - PAL.doughRaw[0])),
-            Math.round(PAL.doughRaw[1] + t * (PAL.doughReady[1] - PAL.doughRaw[1])),
-            Math.round(PAL.doughRaw[2] + t * (PAL.doughReady[2] - PAL.doughRaw[2])),
+            Math.round(PAL.doughRaw[0]! + t * (PAL.doughReady[0]! - PAL.doughRaw[0]!)),
+            Math.round(PAL.doughRaw[1]! + t * (PAL.doughReady[1]! - PAL.doughRaw[1]!)),
+            Math.round(PAL.doughRaw[2]! + t * (PAL.doughReady[2]! - PAL.doughRaw[2]!)),
           );
           lastKneadPos = mp;
         }
         if (state.kneadProgress >= 100 && !kneadDone) {
           kneadDone       = true;
-          kneadPct.text   = "Ready! ✓";
+          kneadPct.text   = "Ready!";
           kneadPct.color  = k.rgb(...PAL.green);
           doughBlob.color = k.rgb(...PAL.doughReady);
         }
@@ -203,25 +203,28 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
     // Sauce layer (hidden until sauce dropped)
     const sauceLayer = k.add([k.circle(P_R - 6), k.color(...PAL.sauce), k.anchor("center"), k.pos(P_CX, P_CY), k.z(4), k.opacity(0)]);
 
-    // Topping definitions — explicit fields, no spread into object literals
+    // Topping definitions
     type TDef = { name: string; col: [number, number, number]; icon: string };
     const TDEFS: TDef[] = [
-      { name: "sauce",     col: PAL.sauce,     icon: "🍅" },
-      { name: "cheese",    col: PAL.cheese,    icon: "🧀" },
-      { name: "pepperoni", col: PAL.pepperoni, icon: "🍕" },
-      { name: "mushroom",  col: PAL.mushroom,  icon: "🍄" },
-      { name: "olive",     col: PAL.olive,     icon: "🫒" },
-      { name: "pepper",    col: PAL.bell,      icon: "🫑" },
+      { name: "sauce",     col: PAL.sauce,     icon: "S" },
+      { name: "cheese",    col: PAL.cheese,    icon: "C" },
+      { name: "pepperoni", col: PAL.pepperoni, icon: "P" },
+      { name: "mushroom",  col: PAL.mushroom,  icon: "M" },
+      { name: "olive",     col: PAL.olive,     icon: "O" },
+      { name: "pepper",    col: PAL.bell,      icon: "G" },
     ];
+    // Full names for labels
+    const TNAMES = ["Sauce", "Cheese", "Pepperoni", "Mushroom", "Olive", "Pepper"];
 
     const BTN_X   = VW / 2 + VW / 4 + 86;
     const BTN_Y0  = VH / 2 + 28;
     const BTN_GAP = 37;
 
     TDEFS.forEach((td, i) => {
-      const by = BTN_Y0 + i * BTN_GAP;
+      const by   = BTN_Y0 + i * BTN_GAP;
+      const name = TNAMES[i] ?? td.name;
       k.add([k.rect(94, 30, { radius: 7 }), k.color(...td.col), k.anchor("center"), k.pos(BTN_X, by), k.z(5), k.area()]);
-      k.add([k.text(`${td.icon} ${td.name}`, { size: 11 }), k.color(...PAL.white), k.anchor("center"), k.pos(BTN_X, by), k.z(6)]);
+      k.add([k.text(name, { size: 11 }), k.color(...PAL.white), k.anchor("center"), k.pos(BTN_X, by), k.z(6)]);
     });
 
     k.add([k.text("Drag toppings onto pizza!", { size: 11 }), k.color(...PAL.gray), k.anchor("center"), k.pos(P_CX - 18, VH / 2 + 28), k.z(4)]);
@@ -343,7 +346,7 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
       ovenPizza.opacity = 0.95;
       ovenGlow.opacity  = 0.18;
       flames.forEach((f) => { f.opacity = 1; });
-      bakeLbl.text  = "Baking... 🔥";
+      bakeLbl.text  = "Baking... fire!";
       bakeLbl.color = k.rgb(255, 180, 80);
     }
 
@@ -366,16 +369,16 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
         bakeBar.width    = Math.max(1, Math.min(150, (bakeTimer / BAKE_TIME) * 150));
         const t = Math.min(1, bakeTimer / BAKE_TIME);
         ovenPizza.color = k.rgb(
-          Math.round(PAL.doughRaw[0] + t * (PAL.doughBaked[0] - PAL.doughRaw[0])),
-          Math.round(PAL.doughRaw[1] + t * (PAL.doughBaked[1] - PAL.doughRaw[1])),
-          Math.round(PAL.doughRaw[2] + t * (PAL.doughBaked[2] - PAL.doughRaw[2])),
+          Math.round(PAL.doughRaw[0]! + t * (PAL.doughBaked[0]! - PAL.doughRaw[0]!)),
+          Math.round(PAL.doughRaw[1]! + t * (PAL.doughBaked[1]! - PAL.doughRaw[1]!)),
+          Math.round(PAL.doughRaw[2]! + t * (PAL.doughBaked[2]! - PAL.doughRaw[2]!)),
         );
         if (bakeTimer >= BAKE_TIME) {
           state.baked = true;
           ovenBaking  = false;
           flames.forEach((f) => { f.opacity = 0; });
           ovenGlow.opacity = 0;
-          bakeLbl.text  = "Done! ✓  Now pack it →";
+          bakeLbl.text  = "Done! Now pack it";
           bakeLbl.color = k.rgb(...PAL.green);
           // Darken topping dots slightly to show baked
           toppingDots.forEach((dot) => {
@@ -426,7 +429,7 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
 
     // Pack button
     k.add([k.rect(148, 40, { radius: 10 }), k.color(...PAL.blue), k.anchor("center"), k.pos(BX_CX, VH / 2 - 22), k.z(5), k.area()]);
-    k.add([k.text("📦  Pack Pizza!", { size: 13 }), k.color(...PAL.white), k.anchor("center"), k.pos(BX_CX, VH / 2 - 22), k.z(6)]);
+    k.add([k.text("Pack Pizza!", { size: 13 }), k.color(...PAL.white), k.anchor("center"), k.pos(BX_CX, VH / 2 - 22), k.z(6)]);
     const packLbl = k.add([k.text("Pack when baked!", { size: 11 }), k.color(...PAL.blue), k.anchor("center"), k.pos(BX_CX, 28), k.z(4)]);
 
     function doPack() {
@@ -443,7 +446,7 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
       // Reveal topping dots
       k.get("packedDot").forEach((d) => { d.opacity = 1; });
       boxLid.opacity = 1;
-      packLbl.text   = "Pizza packed! ✓";
+      packLbl.text   = "Pizza packed!";
       packLbl.color  = k.rgb(...PAL.green);
       const pts = 100 + state.toppings.length * 25;
       state.score += pts;
@@ -470,10 +473,10 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
     });
 
     // Flow arrows on dividers
-    k.add([k.text("↓ knead", { size: 10 }), k.color(...PAL.gray),   k.anchor("center"), k.pos(VW / 4,     VH / 2 - 8), k.z(12)]);
-    k.add([k.text("↓ top",   { size: 10 }), k.color(...PAL.gray),   k.anchor("center"), k.pos(VW * 3 / 4, VH / 2 - 8), k.z(12)]);
-    k.add([k.text("→ bake",  { size: 10 }), k.color(200, 140, 60),  k.anchor("center"), k.pos(VW / 2 + 6,  VH / 4),     k.z(12)]);
-    k.add([k.text("← pack",  { size: 10 }), k.color(...PAL.blue),   k.anchor("center"), k.pos(VW / 2 - 6,  VH / 4),     k.z(12)]);
+    k.add([k.text("v knead", { size: 10 }), k.color(...PAL.gray),   k.anchor("center"), k.pos(VW / 4,     VH / 2 - 8), k.z(12)]);
+    k.add([k.text("v top",   { size: 10 }), k.color(...PAL.gray),   k.anchor("center"), k.pos(VW * 3 / 4, VH / 2 - 8), k.z(12)]);
+    k.add([k.text("> bake",  { size: 10 }), k.color(200, 140, 60),  k.anchor("center"), k.pos(VW / 2 + 6,  VH / 4),     k.z(12)]);
+    k.add([k.text("< pack",  { size: 10 }), k.color(...PAL.blue),   k.anchor("center"), k.pos(VW / 2 - 6,  VH / 4),     k.z(12)]);
   });
 }
 
@@ -497,8 +500,8 @@ function buildCelebrateScene(k: K) {
       ]);
     }
 
-    k.add([k.text("🍕  Pizza Delivered!", { size: 38 }), k.color(...PAL.orange), k.anchor("center"), k.pos(VW / 2, VH / 2 - 100), k.z(2)]);
-    k.add([k.text(`Score: ${finalScore}`,  { size: 34 }), k.color(...PAL.green),  k.anchor("center"), k.pos(VW / 2, VH / 2 - 32),  k.z(2)]);
+    k.add([k.text("Pizza Delivered!", { size: 36 }), k.color(...PAL.orange), k.anchor("center"), k.pos(VW / 2, VH / 2 - 100), k.z(2)]);
+    k.add([k.text(`Score: ${finalScore}`, { size: 32 }), k.color(...PAL.green),  k.anchor("center"), k.pos(VW / 2, VH / 2 - 32),  k.z(2)]);
 
     const toppingStr = state.toppings.length > 0 ? state.toppings.join(", ") : "plain";
     k.add([k.text(`Toppings: ${toppingStr}`, { size: 15 }), k.color(90, 80, 70), k.anchor("center"), k.pos(VW / 2, VH / 2 + 22), k.z(2)]);
@@ -506,8 +509,8 @@ function buildCelebrateScene(k: K) {
     const saved = parseInt(localStorage.getItem("goodpizza_hs") ?? "0", 10);
     const best  = Math.max(finalScore, saved);
     if (finalScore >= saved) localStorage.setItem("goodpizza_hs", String(finalScore));
-    k.add([k.text(`Best: ${best}`,                      { size: 16 }), k.color(185, 138, 48), k.anchor("center"), k.pos(VW / 2, VH / 2 + 60),  k.z(2)]);
-    k.add([k.text("Tap / click for another pizza!", { size: 18 }), k.color(...PAL.blue),   k.anchor("center"), k.pos(VW / 2, VH / 2 + 108), k.z(2)]);
+    k.add([k.text(`Best: ${best}`, { size: 16 }), k.color(185, 138, 48), k.anchor("center"), k.pos(VW / 2, VH / 2 + 60),  k.z(2)]);
+    k.add([k.text("Tap or click for another pizza!", { size: 18 }), k.color(...PAL.blue), k.anchor("center"), k.pos(VW / 2, VH / 2 + 108), k.z(2)]);
 
     k.onMousePress(() => k.go("play"));
     k.onKeyPress("space", () => k.go("play"));
@@ -521,17 +524,16 @@ function buildCelebrateScene(k: K) {
 export function startGame(canvas: HTMLCanvasElement, onScore: (n: number) => void): () => void {
   const k = kaplay({
     canvas,
-    width: VW,
-    height: VH,
-    letterbox: true,
+    width:      VW,
+    height:     VH,
+    letterbox:  true,
+    global:     false,
     background: [245, 235, 215],
-    global: false,
-    pixelDensity: Math.min(window.devicePixelRatio || 1, 2),
   });
 
   buildPlayScene(k, onScore);
   buildCelebrateScene(k);
   k.go("play");
 
-  return () => k.quit();
+  return () => { k.quit(); };
 }
