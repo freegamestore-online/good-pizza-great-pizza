@@ -1,8 +1,8 @@
-# APPNAME
+# Good pizza great pizza
 
 A free game on FreeGameStore, built on the **KAPLAY** browser game engine.
 
-- Subdomain: `APPNAME.freegamestore.online`
+- Subdomain: `Good pizza great pizza.freegamestore.online`
 - Dev: `pnpm install && pnpm dev`
 - Build: `pnpm build`
 - Deploy: `git push origin main` (auto-deploys to R2 via GitHub Actions)
