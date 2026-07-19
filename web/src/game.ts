@@ -114,12 +114,12 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
       k.z(2),
     ]);
 
-    // Knead ripple rings (use opacity component)
+    // Knead ripple rings
     const ring1 = k.add([k.circle(D_R - 10), k.color(220, 190, 140), k.anchor("center"), k.pos(D_CX, D_CY), k.z(3), k.opacity(0)]);
     const ring2 = k.add([k.circle(D_R - 22), k.color(220, 190, 140), k.anchor("center"), k.pos(D_CX, D_CY), k.z(3), k.opacity(0)]);
     const ring3 = k.add([k.circle(D_R - 34), k.color(220, 190, 140), k.anchor("center"), k.pos(D_CX, D_CY), k.z(3), k.opacity(0)]);
 
-    // Progress bar bg
+    // Progress bar
     k.add([k.rect(160, 16, { radius: 8 }), k.color(200, 188, 168), k.anchor("center"), k.pos(D_CX, VH - 22), k.z(3)]);
     const kneadBar = k.add([k.rect(1, 12, { radius: 6 }), k.color(...PAL.green), k.pos(D_CX - 80, VH - 28), k.z(4)]);
     const kneadPct = k.add([k.text("Knead: 0%", { size: 12 }), k.color(...PAL.black), k.anchor("center"), k.pos(D_CX, VH - 44), k.z(4)]);
@@ -149,9 +149,9 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
           kneadPct.text  = `Knead: ${Math.floor(state.kneadProgress)}%`;
           const t = state.kneadProgress / 100;
           doughBlob.color = k.rgb(
-            Math.round(PAL.doughRaw[0]! + t * (PAL.doughReady[0]! - PAL.doughRaw[0]!)),
-            Math.round(PAL.doughRaw[1]! + t * (PAL.doughReady[1]! - PAL.doughRaw[1]!)),
-            Math.round(PAL.doughRaw[2]! + t * (PAL.doughReady[2]! - PAL.doughRaw[2]!)),
+            Math.round(PAL.doughRaw[0] + t * (PAL.doughReady[0] - PAL.doughRaw[0])),
+            Math.round(PAL.doughRaw[1] + t * (PAL.doughReady[1] - PAL.doughRaw[1])),
+            Math.round(PAL.doughRaw[2] + t * (PAL.doughReady[2] - PAL.doughRaw[2])),
           );
           lastKneadPos = mp;
         }
@@ -180,9 +180,10 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
       const te = e as TouchEvent;
       const t0 = te.touches[0];
       if (!t0) return;
-      const rect   = (k as unknown as { canvas: HTMLCanvasElement }).canvas.getBoundingClientRect();
-      const tx     = (t0.clientX - rect.left) * (VW / rect.width);
-      const ty     = (t0.clientY - rect.top)  * (VH / rect.height);
+      const cvs  = (k as unknown as { canvas: HTMLCanvasElement }).canvas;
+      const rect = cvs.getBoundingClientRect();
+      const tx   = (t0.clientX - rect.left) * (VW / rect.width);
+      const ty   = (t0.clientY - rect.top)  * (VH / rect.height);
       if (tx < VW / 2 && ty > VH / 2 && Math.hypot(tx - D_CX, ty - D_CY) < D_R + 12) {
         isDraggingDough = true;
         lastKneadPos    = k.vec2(tx, ty);
@@ -204,27 +205,24 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
     const sauceLayer = k.add([k.circle(P_R - 6), k.color(...PAL.sauce), k.anchor("center"), k.pos(P_CX, P_CY), k.z(4), k.opacity(0)]);
 
     // Topping definitions
-    type TDef = { name: string; col: [number, number, number]; icon: string };
+    type TDef = { name: string; col: [number, number, number]; label: string };
     const TDEFS: TDef[] = [
-      { name: "sauce",     col: PAL.sauce,     icon: "S" },
-      { name: "cheese",    col: PAL.cheese,    icon: "C" },
-      { name: "pepperoni", col: PAL.pepperoni, icon: "P" },
-      { name: "mushroom",  col: PAL.mushroom,  icon: "M" },
-      { name: "olive",     col: PAL.olive,     icon: "O" },
-      { name: "pepper",    col: PAL.bell,      icon: "G" },
+      { name: "sauce",     col: PAL.sauce,     label: "Sauce" },
+      { name: "cheese",    col: PAL.cheese,    label: "Cheese" },
+      { name: "pepperoni", col: PAL.pepperoni, label: "Pepperoni" },
+      { name: "mushroom",  col: PAL.mushroom,  label: "Mushroom" },
+      { name: "olive",     col: PAL.olive,     label: "Olive" },
+      { name: "pepper",    col: PAL.bell,      label: "Pepper" },
     ];
-    // Full names for labels
-    const TNAMES = ["Sauce", "Cheese", "Pepperoni", "Mushroom", "Olive", "Pepper"];
 
     const BTN_X   = VW / 2 + VW / 4 + 86;
     const BTN_Y0  = VH / 2 + 28;
     const BTN_GAP = 37;
 
     TDEFS.forEach((td, i) => {
-      const by   = BTN_Y0 + i * BTN_GAP;
-      const name = TNAMES[i] ?? td.name;
+      const by = BTN_Y0 + i * BTN_GAP;
       k.add([k.rect(94, 30, { radius: 7 }), k.color(...td.col), k.anchor("center"), k.pos(BTN_X, by), k.z(5), k.area()]);
-      k.add([k.text(name, { size: 11 }), k.color(...PAL.white), k.anchor("center"), k.pos(BTN_X, by), k.z(6)]);
+      k.add([k.text(td.label, { size: 11 }), k.color(...PAL.white), k.anchor("center"), k.pos(BTN_X, by), k.z(6)]);
     });
 
     k.add([k.text("Drag toppings onto pizza!", { size: 11 }), k.color(...PAL.gray), k.anchor("center"), k.pos(P_CX - 18, VH / 2 + 28), k.z(4)]);
@@ -346,7 +344,7 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
       ovenPizza.opacity = 0.95;
       ovenGlow.opacity  = 0.18;
       flames.forEach((f) => { f.opacity = 1; });
-      bakeLbl.text  = "Baking... fire!";
+      bakeLbl.text  = "Baking...";
       bakeLbl.color = k.rgb(255, 180, 80);
     }
 
@@ -369,9 +367,9 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
         bakeBar.width    = Math.max(1, Math.min(150, (bakeTimer / BAKE_TIME) * 150));
         const t = Math.min(1, bakeTimer / BAKE_TIME);
         ovenPizza.color = k.rgb(
-          Math.round(PAL.doughRaw[0]! + t * (PAL.doughBaked[0]! - PAL.doughRaw[0]!)),
-          Math.round(PAL.doughRaw[1]! + t * (PAL.doughBaked[1]! - PAL.doughRaw[1]!)),
-          Math.round(PAL.doughRaw[2]! + t * (PAL.doughBaked[2]! - PAL.doughRaw[2]!)),
+          Math.round(PAL.doughRaw[0] + t * (PAL.doughBaked[0] - PAL.doughRaw[0])),
+          Math.round(PAL.doughRaw[1] + t * (PAL.doughBaked[1] - PAL.doughRaw[1])),
+          Math.round(PAL.doughRaw[2] + t * (PAL.doughBaked[2] - PAL.doughRaw[2])),
         );
         if (bakeTimer >= BAKE_TIME) {
           state.baked = true;
@@ -465,7 +463,8 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
       const te = e as TouchEvent;
       const t0 = te.touches[0];
       if (!t0) return;
-      const rect = (k as unknown as { canvas: HTMLCanvasElement }).canvas.getBoundingClientRect();
+      const cvs  = (k as unknown as { canvas: HTMLCanvasElement }).canvas;
+      const rect = cvs.getBoundingClientRect();
       const tx   = (t0.clientX - rect.left) * (VW / rect.width);
       const ty   = (t0.clientY - rect.top)  * (VH / rect.height);
       if (tx < VW / 2 && ty < VH / 2 && Math.hypot(tx - BX_CX, ty - (VH / 2 - 22)) < 88) doPack();
@@ -473,10 +472,10 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
     });
 
     // Flow arrows on dividers
-    k.add([k.text("v knead", { size: 10 }), k.color(...PAL.gray),   k.anchor("center"), k.pos(VW / 4,     VH / 2 - 8), k.z(12)]);
-    k.add([k.text("v top",   { size: 10 }), k.color(...PAL.gray),   k.anchor("center"), k.pos(VW * 3 / 4, VH / 2 - 8), k.z(12)]);
-    k.add([k.text("> bake",  { size: 10 }), k.color(200, 140, 60),  k.anchor("center"), k.pos(VW / 2 + 6,  VH / 4),     k.z(12)]);
-    k.add([k.text("< pack",  { size: 10 }), k.color(...PAL.blue),   k.anchor("center"), k.pos(VW / 2 - 6,  VH / 4),     k.z(12)]);
+    k.add([k.text("knead ->", { size: 10 }), k.color(...PAL.gray),   k.anchor("center"), k.pos(VW / 4,     VH / 2 - 8), k.z(12)]);
+    k.add([k.text("top ->",   { size: 10 }), k.color(...PAL.gray),   k.anchor("center"), k.pos(VW * 3 / 4, VH / 2 - 8), k.z(12)]);
+    k.add([k.text("-> bake",  { size: 10 }), k.color(200, 140, 60),  k.anchor("center"), k.pos(VW / 2 + 6,  VH / 4),     k.z(12)]);
+    k.add([k.text("<- pack",  { size: 10 }), k.color(...PAL.blue),   k.anchor("center"), k.pos(VW / 2 - 6,  VH / 4),     k.z(12)]);
   });
 }
 
@@ -500,8 +499,8 @@ function buildCelebrateScene(k: K) {
       ]);
     }
 
-    k.add([k.text("Pizza Delivered!", { size: 36 }), k.color(...PAL.orange), k.anchor("center"), k.pos(VW / 2, VH / 2 - 100), k.z(2)]);
-    k.add([k.text(`Score: ${finalScore}`, { size: 32 }), k.color(...PAL.green),  k.anchor("center"), k.pos(VW / 2, VH / 2 - 32),  k.z(2)]);
+    k.add([k.text("Pizza Delivered!", { size: 38 }), k.color(...PAL.orange), k.anchor("center"), k.pos(VW / 2, VH / 2 - 100), k.z(2)]);
+    k.add([k.text(`Score: ${finalScore}`,  { size: 34 }), k.color(...PAL.green),  k.anchor("center"), k.pos(VW / 2, VH / 2 - 32),  k.z(2)]);
 
     const toppingStr = state.toppings.length > 0 ? state.toppings.join(", ") : "plain";
     k.add([k.text(`Toppings: ${toppingStr}`, { size: 15 }), k.color(90, 80, 70), k.anchor("center"), k.pos(VW / 2, VH / 2 + 22), k.z(2)]);
@@ -509,8 +508,8 @@ function buildCelebrateScene(k: K) {
     const saved = parseInt(localStorage.getItem("goodpizza_hs") ?? "0", 10);
     const best  = Math.max(finalScore, saved);
     if (finalScore >= saved) localStorage.setItem("goodpizza_hs", String(finalScore));
-    k.add([k.text(`Best: ${best}`, { size: 16 }), k.color(185, 138, 48), k.anchor("center"), k.pos(VW / 2, VH / 2 + 60),  k.z(2)]);
-    k.add([k.text("Tap or click for another pizza!", { size: 18 }), k.color(...PAL.blue), k.anchor("center"), k.pos(VW / 2, VH / 2 + 108), k.z(2)]);
+    k.add([k.text(`Best: ${best}`,                   { size: 16 }), k.color(185, 138, 48), k.anchor("center"), k.pos(VW / 2, VH / 2 + 60),  k.z(2)]);
+    k.add([k.text("Tap or click for another pizza!", { size: 18 }), k.color(...PAL.blue),  k.anchor("center"), k.pos(VW / 2, VH / 2 + 108), k.z(2)]);
 
     k.onMousePress(() => k.go("play"));
     k.onKeyPress("space", () => k.go("play"));
@@ -521,7 +520,10 @@ function buildCelebrateScene(k: K) {
 // ─────────────────────────────────────────────────────────────────────────────
 //  ENTRY POINT
 // ─────────────────────────────────────────────────────────────────────────────
-export function startGame(canvas: HTMLCanvasElement, onScore: (n: number) => void): () => void {
+export function startGame(
+  canvas: HTMLCanvasElement,
+  onScore: (n: number) => void,
+): () => void {
   const k = kaplay({
     canvas,
     width:      VW,
