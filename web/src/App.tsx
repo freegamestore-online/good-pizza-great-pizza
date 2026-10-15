@@ -15,7 +15,7 @@ export default function App() {
 
   return (
     <GameShell
-      topbar={<GameTopbar title="Good Pizza Great Pizza" score={score} />}
+      topbar={<GameTopbar title="Slice Master" score={score} />}
       footer={
         <a
           href="https://freegamestore.online"

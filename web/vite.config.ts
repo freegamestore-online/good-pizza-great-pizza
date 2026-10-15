@@ -41,9 +41,9 @@ export default defineConfig({
       // field passes through to the emitted manifest.webmanifest; browsers
       // ignore unknown members.
       manifest: {
-        name: "Good pizza great pizza",
-        short_name: "Good pizza great pizza",
-        description: "Good pizza great pizza — free forever",
+        name: "Slice Master",
+        short_name: "Slice Master",
+        description: "Slice Master — free forever",
         start_url: "/",
         display: "standalone",
         background_color: "#0f0f0f",
