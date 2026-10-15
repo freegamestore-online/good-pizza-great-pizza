@@ -1,4 +1,5 @@
 import kaplay from "kaplay";
+import { circleArea } from "./shapes";
 type K = ReturnType<typeof kaplay>;
 
 // Virtual canvas dimensions
@@ -110,7 +111,7 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
       k.color(...PAL.doughRaw),
       k.anchor("center"),
       k.pos(D_CX, D_CY),
-      k.area({ shape: new k.Circle(k.vec2(0, 0), D_R) }),
+      k.area({ shape: circleArea(k, D_R) }),
       k.z(2),
     ]);
 
