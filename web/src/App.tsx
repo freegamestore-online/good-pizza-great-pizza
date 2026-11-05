@@ -16,17 +16,6 @@ export default function App() {
   return (
     <GameShell
       topbar={<GameTopbar title="Slice Master" score={score} />}
-      footer={
-        <a
-          href="https://freegamestore.online"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs opacity-60 hover:opacity-100 transition-opacity"
-          style={{ fontFamily: "Manrope, sans-serif" }}
-        >
-          More free games at freegamestore.online
-        </a>
-      }
     >
       <canvas ref={canvasRef} className="w-full h-full block touch-none" />
     </GameShell>

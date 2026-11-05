@@ -1,4 +1,5 @@
 import kaplay from "kaplay";
+import type { GameObj } from "kaplay";
 import { circleArea } from "./shapes";
 type K = ReturnType<typeof kaplay>;
 
@@ -177,10 +178,7 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
     });
 
     // Touch knead
-    k.onTouchStart((_touch, e) => {
-      const te = e as TouchEvent;
-      const t0 = te.touches[0];
-      if (!t0) return;
+    k.onTouchStart((_pos, t0) => {
       const cvs  = (k as unknown as { canvas: HTMLCanvasElement }).canvas;
       const rect = cvs.getBoundingClientRect();
       const tx   = (t0.clientX - rect.left) * (VW / rect.width);
@@ -230,9 +228,9 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
     const toppingCountLbl = k.add([k.text("Toppings: 0", { size: 12 }), k.color(...PAL.black), k.anchor("center"), k.pos(P_CX - 18, VH - 22), k.z(4)]);
 
     // Placed topping dots (stored so we can darken on bake)
-    const toppingDots: ReturnType<K["add"]>[] = [];
+    const toppingDots: GameObj[] = [];
 
-    let dragTopping: { name: string; col: [number, number, number]; obj: ReturnType<K["add"]> } | null = null;
+    let dragTopping: { name: string; col: [number, number, number]; obj: GameObj } | null = null;
 
     k.onMousePress(() => {
       const mp = k.mousePos();
@@ -307,7 +305,7 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
 
     // Flames (hidden until baking)
     const flameXs = [-28, -10, 8, 26];
-    const flames: ReturnType<K["add"]>[] = [];
+    const flames: GameObj[] = [];
     for (const fx of flameXs) {
       flames.push(k.add([k.rect(10, 18, { radius: 5 }), k.color(...PAL.fire1), k.anchor("center"), k.pos(OV_CX + fx, OV_CY + 14), k.z(6), k.opacity(0)]));
       flames.push(k.add([k.rect(7,  12, { radius: 4 }), k.color(...PAL.fire2), k.anchor("center"), k.pos(OV_CX + fx, OV_CY + 16), k.z(7), k.opacity(0)]));
@@ -460,10 +458,7 @@ function buildPlayScene(k: K, onScore: (n: number) => void) {
     });
 
     // Touch: pack + oven
-    k.onTouchStart((_touch, e) => {
-      const te = e as TouchEvent;
-      const t0 = te.touches[0];
-      if (!t0) return;
+    k.onTouchStart((_pos, t0) => {
       const cvs  = (k as unknown as { canvas: HTMLCanvasElement }).canvas;
       const rect = cvs.getBoundingClientRect();
       const tx   = (t0.clientX - rect.left) * (VW / rect.width);
